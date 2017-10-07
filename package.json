@@ -1,0 +1,27 @@
+{
+  "name": "particletrain",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "serve ./",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timoman7/ParticleTrain.git"
+  },
+  "keywords": [
+    "Coding",
+    "Train",
+    "Daniel",
+    "Shiffman",
+    "Bane"
+  ],
+  "author": "Tim C",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/timoman7/ParticleTrain/issues"
+  },
+  "homepage": "https://github.com/timoman7/ParticleTrain#readme"
+}
