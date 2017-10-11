@@ -8,7 +8,7 @@ export default class Vector{
   }
   set(){
     if(arguments.length !== 0){
-      if(Object.keys(arguments[0]).includes("x")){
+      if(arguments[0].x !== undefined){
         this.x = arguments[0].x, this.y = arguments[0].y;
       }else{
         this.x = arguments[0], this.y = arguments[1];
@@ -19,16 +19,18 @@ export default class Vector{
   }
   add(){
     if(arguments.length !== 0){
-      if(Object.keys(arguments[0]).includes("x")){
+      if(arguments[0].x !== undefined){
         this.x += arguments[0].x, this.y += arguments[0].y;
       }else{
+        console.log(arguments[0]);
         this.x += arguments[0], this.y += arguments[1];
       }
     }
   }
   sub(){
     if(arguments.length !== 0){
-      if(Object.keys(arguments[0]).includes("x")){
+      if(arguments[0].x !== undefined){
+        console.log(arguments[0].x);
         this.x -= arguments[0].x, this.y -= arguments[0].y;
       }else{
         this.x -= arguments[0], this.y -= arguments[1];
@@ -38,7 +40,7 @@ export default class Vector{
   div(){
     if(arguments.length !== 0){
       if(arguments.length == 1){
-        if(Object.keys(arguments[0]).includes("x")){
+        if(arguments[0].x !== undefined){
           this.x /= arguments[0].x, this.y /= arguments[0].y;
         }else{
           this.x /= arguments[0], this.y /= arguments[0];
@@ -51,7 +53,7 @@ export default class Vector{
   mult(){
     if(arguments.length !== 0){
       if(arguments.length == 1){
-        if(Object.keys(arguments[0]).includes("x")){
+        if(arguments[0].x !== undefined){
           this.x *= arguments[0].x, this.y *= arguments[0].y;
         }else{
           this.x *= arguments[0], this.y *= arguments[0];
