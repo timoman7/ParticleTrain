@@ -15,7 +15,9 @@ export default class Train {
   }
 
   addPart(x, y, w, h, _type, _color, parent){
-    this.parts.push(new Part(x, y, w, h, _type, _color, parent));
+    let newPart = new Part(x, y, w, h, _type, _color, parent);
+    this.parts.push(newPart);
+    return newPart
   }
 
   sortByX(){
@@ -46,11 +48,11 @@ export default class Train {
         newSmokeX = 0, newSmokeY = 0;
       }
       let tempSmoke = new Particle(newSmokeX, newSmokeY, newSmokeR, newSmokeColor);
-      tempSmoke.setLifetime(500);
+      tempSmoke.setLifetime(300);
       let rngX = (Math.random() - 0.5);
       let rngY = (Math.random() - 0.5);
-      tempSmoke.vel.set(0 + rngX, -4 + rngY);
-      tempSmoke.startVel.set(0 + rngX, -4 + rngY);
+      tempSmoke.vel.set(0 + rngX, -3 + rngY);
+      tempSmoke.startVel.set(0 + rngX, -3 + rngY);
       tempSmoke.setColor(newSmokeColor);
       tempSmoke.update();
       this.smoke.push(tempSmoke);
@@ -91,19 +93,106 @@ class Part{
     this.size = {w: w, h: h};
     this.type = _type;
     this.color = _color;
+    this.rot = 0;
+    this.connections = [];
     return this
   }
 
-  update(){
-    this.pos.set(this.offset.x + this.parent.pos.x, this.offset.y + this.parent.pos.y);
+  addConnector(target){
+    let newConnection = new Connector(this, target);
+    this.connections.push(newConnection);
+    return newConnection
   }
 
+  update(){
+    switch(this.type){
+      case "wheel":
+        this.pos.set(this.offset.x + this.parent.pos.x, this.offset.y + this.parent.pos.y);
+        if(this.rot > 2 * Math.PI){
+          this.rot = 0;
+        }else{
+          this.rot += Math.PI / 180;
+        }
+        for(let _Connection in this.connections){
+          let curConnection = this.connections[_Connection];
+          let rotX = Math.cos(this.rot) * (this.size.w / 2);
+          let rotY = Math.sin(this.rot) * (this.size.h / 2);
+          curConnection.setPOffset(rotX, rotY);
+          let tPart = curConnection.target;
+          let tRotX = Math.cos(this.rot) * (tPart.size.w / 2);
+          let tRotY = Math.sin(this.rot) * (tPart.size.h / 2);
+          curConnection.setTOffset(tRotX, tRotY);
+          this.connections[_Connection].update();
+        }
+        break;
+      default:
+        this.pos.set(this.offset.x + this.parent.pos.x, this.offset.y + this.parent.pos.y);
+        for(let _Connection in this.connections){
+          this.connections[_Connection].update();
+        }
+        break;
+    }
+  }
+  /**
+  * Add wheel type that functions as its own class
+  */
   draw(){
     context.fillStyle = this.color;
+    context.strokeStyle="rgb(100,100,100)";
+    context.stroke();
     switch(this.type){
       case "rect":
         context.fillRect(this.pos.x,this.pos.y,this.size.w,this.size.h);
         break;
+      case "ellipse":
+        context.beginPath(); // x, y, w, h, rotation in rad, start angle, end angle (0, 2Math.PI = full circle)
+        context.ellipse(this.pos.x, this.pos.y, this.size.w, this.size.h, 0, 0, 2 * Math.PI);
+        //Vanilla ellipses are genuinly the most confusing thing :/
+        context.fill();
+        context.closePath();
+        break;
+      case "wheel":
+        context.beginPath(); // x, y, w, h, rotation in rad, start angle, end angle (0, 2Math.PI = full circle)
+        context.ellipse(this.pos.x, this.pos.y, this.size.w, this.size.h, this.rot, 0, 2 * Math.PI);
+        //Vanilla ellipses are genuinly the most confusing thing :/
+        context.fill();
+        context.closePath();
+        break;
     }
+    for(let _Connection in this.connections){
+      this.connections[_Connection].draw();
+    }
+  }
+}
+class Connector{
+  constructor(parent, target){
+    this.parent = parent;
+    this.target = target;
+    this.parentOffset = new Vector(0, 0);
+    this.targetOffset = new Vector(0, 0);
+    this.startPos = new Vector(this.parent.pos.x + this.parentOffset.x, this.parent.pos.y + this.parentOffset.y);
+    this.endPos = new Vector(this.target.pos.x + this.targetOffset.x, this.target.pos.y + this.targetOffset.y);
+    return this;
+  }
+
+  setPOffset(x, y){
+    this.parentOffset.set(x, y);
+  }
+
+  setTOffset(x, y){
+    this.targetOffset.set(x, y);
+  }
+
+  update(){
+    this.startPos.set(this.parent.pos.x + this.parentOffset.x, this.parent.pos.y + this.parentOffset.y);
+    this.endPos.set(this.target.pos.x + this.targetOffset.x, this.target.pos.y + this.targetOffset.y);
+  }
+
+  draw(){
+    context.stroke();
+    context.beginPath();
+    context.moveTo(this.startPos.x, this.startPos.y);
+    context.lineTo(this.endPos.x, this.endPos.y);
+    context.closePath();
   }
 }

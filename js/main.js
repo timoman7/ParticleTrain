@@ -46,11 +46,14 @@ function constructTrain(){
   //
 
   //Head car
+  CodingTrain.addPart(70, 40, 100, 40, "rect", Colors.cart, CodingTrain); //Right
   CodingTrain.addPart(0, 0, 10, 80, "rect", Colors.cart, CodingTrain);  //Left
   CodingTrain.addPart(0, 50, 80, 30, "rect", Colors.cart, CodingTrain); //Bottom
   CodingTrain.addPart(70, 0, 10, 80, "rect", Colors.cart, CodingTrain); //Right
   CodingTrain.addPart(0, 0, 80, 10, "rect", Colors.cart, CodingTrain);  //Top
-
+  let Wheel1 = CodingTrain.addPart(40, 100, 20, 20, "wheel", Colors.cart, CodingTrain);  //Wheel1
+  let Wheel2 = CodingTrain.addPart(140, 100, 10, 10, "wheel", Colors.cart, CodingTrain);  //Wheel2
+  window.connection1 = Wheel1.addConnector(Wheel2);
   //Connector
   CodingTrain.addPart(-40, 60, 60, 10, "rect", Colors.cart, CodingTrain);
 
@@ -69,11 +72,29 @@ function puffSmoke(){
     CodingTrain.addSmoke(
       CodingTrain.parts[CodingTrain.parts.length-1].pos.x + ((1 + i) * 10),
       CodingTrain.parts[CodingTrain.parts.length-1].pos.y,
-      5,
+      3,
       Rainbow[i]
     ); //Make the rainbow
   }
 }
+
+function randomSmoke(duration, modu, state){
+  if(duration % modu){
+    puffSmoke();
+  }
+  if(state){
+    if(duration <= 0){
+      setTimeout(randomSmoke.bind(null, duration - 1, modu, false), 10);
+    }else{
+      setTimeout(randomSmoke.bind(null, duration - 1, modu, true), 10);
+    }
+  }else{
+    let puffTime = Math.floor(Math.random() * 50);
+    let puffDelay = Math.floor(Math.random() * 1000) - puffTime;
+    setTimeout(randomSmoke.bind(null, puffTime, modu, true), puffDelay);
+  }
+}
+
 /**
 * Drawing, updating, and setting up
 */
@@ -82,7 +103,7 @@ function setup(){
   CodingTrain.pos.set(0, 300);
   CodingTrain.vel.set(2,0);
   constructTrain();
-
+  randomSmoke(40, 4, true);
   update();
   draw();
 }
